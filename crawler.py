@@ -1,19 +1,22 @@
 import requests
-from bs4 import BeautifulSoup
 
-url = "https://www.cwa.gov.tw/V8/C/W/TemperatureTop.html"
+# 台北經緯度
+latitude = 25.0478
+longitude = 121.5319
+
+# 組 API URL
+url = f"https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&current_weather=true"
+
+# 發送 GET 請求
 response = requests.get(url)
 
-if response.status_code == 200:
-    soup = BeautifulSoup(response.text, "html.parser")
-    rows = soup.find_all("tr")  # 找所有表格列
+# 解析 JSON
+data = response.json()
 
-    for row in rows:
-        cells = row.find_all("td")
-        if len(cells) > 0 and "臺北" in cells[0].text:
-            temp = cells[1].text.strip()  # 第 1 欄是地點，第 2 欄是溫度
-            print("台北市現在氣溫是：", temp, "°C")
-            break  # 找到就不用繼續找了
-else:
-    print("網站讀取失敗！")
+# 抓出現在溫度
+temperature = data["current_weather"]["temperature"]
+
+print("台北市現在氣溫是：", temperature, "°C")
+
+
 
